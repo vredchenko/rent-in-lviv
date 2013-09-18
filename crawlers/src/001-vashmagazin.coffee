@@ -5,6 +5,7 @@ casper              = require('casper').create(
     #logLevel:   "debug"
 )
 RentalProperty      = require './rental-property'
+currentRegion       = null
 startUrl            = 'http://vashmagazin.ua/cat/catalog/?rub=128'
 visitedUrls         = []
 pendingUrls         = []
@@ -16,7 +17,6 @@ pendingUrls         = []
 # @todo  work with FS
 # @todo  investigate Spooky.js for running Casper from inside nodejs
 # @todo  write a test suite ensuring markup we rely on has not changed
-# @todo  scrape images at a later date
 
 
 
@@ -51,24 +51,34 @@ getLastPage = ->
 #  
 parseContentListingHTML = (html)->
     # divider class is 'r_top_r'
-    el = document.createElement('tbody')
-    el.innerHTML = html
-    i = 0
-    listing = []
-    data = ''
+    el              = document.createElement('tbody')
+    el.innerHTML    = html
+    i               = 0
+    listing         = []
+    data            = new RentalProperty
+    data.setRegion  currentRegion 
 
     for row in el.children
+        
         if ( row.className isnt 'r_top_r' and row.className isnt 'border_bo' )
             tds = row.children
             for td in tds
-                if ( td.className isnt 'td.right_border_table' )
-                   data += ' foo' # @todo aggregate data here from various td contents
+                if ( td.className isnt 'td.right_border_table' ) # this td has no useful info
+                    
+                    if ( td.querySelectorAll( 'span.photocount' ).length ) # get photos
+                        data.setNumImages parseInt ( td.querySelectorAll( 'span.photocount' )[0].textContent ) 
+                        # @todo find a way to extract the images themselves
+
+                    else # default case - extract text content
+                        data.addRemark td.textContent.replace('&nbsp;', '')
+        
         else if ( row.className is 'r_top_r' ) # start next data record
-            listing.push data
-            data = ''
+            listing.push data.getData()
+            data = new RentalProperty
+            data.setRegion currentRegion 
             i++
 
-    casper.echo i
+    console.log listing
 
 # function called recursively during crawl
 # 
@@ -99,16 +109,16 @@ spider = (url)->
         else # it's a listing page
             currentRegion = @evaluate getListingRegion
             currentPage   = @evaluate getCurrentPage
-            
-            if ( currentPage == '1' ) # add pages 2 - last to pendingUrls stack
+
+            # add pages 2 - last to pendingUrls stack
+            if ( currentPage == '1' ) 
                 lastPage = @evaluate getLastPage
                 links = ( url+'&page='+num for num in [2..lastPage] ) 
                 pendingUrls = pendingUrls.concat links    
 
-            # @todo continue here!
             @click 'span#detail_all' # click button to unfold all detailed info
             htmlContent = @getHTML 'table.ogolosh-avto-sp tbody'
-            rawData     = parseContentListingHTML htmlContent
+            rawData     = parseContentListingHTML( htmlContent )
             # console.log rawData
 
         # recurse in

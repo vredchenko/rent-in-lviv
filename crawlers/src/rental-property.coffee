@@ -2,16 +2,20 @@
 
 class RentalProperty
 
-    @data = 
-        address:        null
-        rooms:          null
+    data: 
+        address:            null
+        region:             null
+        rooms:              null
         price:
-            uah:        null
-            usd:        null
-            euro:       null
-        comments:       null
-        images:         []
-        contacts:       []
+            uah:            null
+            usd:            null
+            euro:           null
+        comments:           null
+        images:             []
+        nImages:            null
+        contacts:           []
+        additionalRemarks:  []
+
 
     constructor: ->
 
@@ -20,3 +24,18 @@ class RentalProperty
 
     getData: ->
         @data
+    
+    # setters. @todo refactor to the point of elegance
+    # 
+    setRegion: (value)->
+        @data.region = value
+
+    setNumImages: (value)->
+        @data.nImages = value
+
+    addRemark: (value)->
+        @data.additionalRemarks.push( value )
+
+
+
+module.exports = RentalProperty
