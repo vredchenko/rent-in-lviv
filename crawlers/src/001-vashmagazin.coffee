@@ -4,16 +4,21 @@ casper              = require('casper').create(
     verbose:    true
     #logLevel:   "debug"
 )
+RentalProperty      = require './rental-property'
 startUrl            = 'http://vashmagazin.ua/cat/catalog/?rub=128'
 visitedUrls         = []
 pendingUrls         = []
-pagelessUrl         = '' # used inside getSubCategoryPageUrls function
 
 
+
+# @NOTES
 # @todo  time the whole thing
 # @todo  work with FS
-# @todo  add a grunt file for watching coffee errors
-# @todo  investigate Spooky.js for running Casper from with nodejs
+# @todo  investigate Spooky.js for running Casper from inside nodejs
+# @todo  write a test suite ensuring markup we rely on has not changed
+# @todo  scrape images at a later date
+
+
 
 getSubCategories = -> # get subcategories from the landing page
     links = document.querySelectorAll "a.chapter_rub"
@@ -21,13 +26,16 @@ getSubCategories = -> # get subcategories from the landing page
         # @todo exclude "Popyt" using synonyms pattern
         e.getAttribute( "href" ).replace( "../", "http://vashmagazin.ua/" )
 
+
 getListingRegion = ->
     links = document.querySelectorAll "a.leftmenu_subrub_a"
     links[0].textContent
 
+
 getCurrentPage = ->
     links = document.querySelectorAll "div.page.current a"
     links[0].textContent
+
 
 getLastPage = ->
     pageLinks = document.querySelectorAll "div.page a" 
@@ -35,8 +43,33 @@ getLastPage = ->
         e.textContent
     links.pop() # gets rid of "next page" link
     lastPage = parseInt links.pop()
-    
-    
+
+
+# param passed in is a string of messy string of html that we now need to parse
+# to get our precious data out. This is also the most vulnerable part of the scraper
+# sensitive to minor changes in the page's layout
+#  
+parseContentListingHTML = (html)->
+    # divider class is 'r_top_r'
+    el = document.createElement('tbody')
+    el.innerHTML = html
+    i = 0
+    listing = []
+    data = ''
+
+    for row in el.children
+        if ( row.className isnt 'r_top_r' and row.className isnt 'border_bo' )
+            tds = row.children
+            for td in tds
+                if ( td.className isnt 'td.right_border_table' )
+                   data += ' foo' # @todo aggregate data here from various td contents
+        else if ( row.className is 'r_top_r' ) # start next data record
+            listing.push data
+            data = ''
+            i++
+
+    casper.echo i
+
 # function called recursively during crawl
 # 
 spider = (url)->
@@ -73,8 +106,11 @@ spider = (url)->
                 pendingUrls = pendingUrls.concat links    
 
             # @todo continue here!
-            @echo "@todo: time to scrape content!"
-            
+            @click 'span#detail_all' # click button to unfold all detailed info
+            htmlContent = @getHTML 'table.ogolosh-avto-sp tbody'
+            rawData     = parseContentListingHTML htmlContent
+            # console.log rawData
+
         # recurse in
         if ( pendingUrls.length > 0 )
             nextUrl = pendingUrls.shift()

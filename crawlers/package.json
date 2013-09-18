@@ -1,0 +1,20 @@
+{
+  "name": "rent-in-lviv-crawlers",
+  "version": "0.0.1",
+  "description": "Series of crawlers to scrape property listings from various websites",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "vredchenko",
+  "license": "MIT",
+  "dependencies": {
+    "moment": "~2.2.1",
+    "underscore": "~1.5.2"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-contrib-coffee": "~0.7.0"
+  }
+}
