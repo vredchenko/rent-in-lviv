@@ -5,15 +5,23 @@ class RentalProperty
     data: 
         address:            null
         region:             null
-        rooms:              null
+        
+        nRooms:             null
+        floor:              null
+        area:               null
+
         price:
             uah:            null
             usd:            null
             euro:           null
+        
         comments:           null
+        
         images:             []
         nImages:            null
+        
         contacts:           []
+        
         additionalRemarks:  []
 
 
@@ -36,6 +44,29 @@ class RentalProperty
     addRemark: (value)->
         @data.additionalRemarks.push( value )
 
+    addContact: (value)->
+        @data.contacts.push( value )
+
+    setAddress: (value)->
+        @data.address = value
+
+    setNumRooms: (value)->
+        @data.nRooms = value
+
+    setFloor: (value)->
+        @data.floor = value
+
+    setArea: (value)->
+        @data.area = value
+
+    setPriceUAH: (value)->
+        @data.price.uah = value
+
+    setPriceUSD: (value)->
+        @data.price.usd = value
+
+    setPriceEURO: (value)->
+        @data.price.euro = value
 
 
 module.exports = RentalProperty

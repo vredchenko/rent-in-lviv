@@ -14,9 +14,10 @@ pendingUrls         = []
 
 # @NOTES
 # @todo  time the whole thing
-# @todo  work with FS
+# @todo  save to FS
 # @todo  investigate Spooky.js for running Casper from inside nodejs
 # @todo  write a test suite ensuring markup we rely on has not changed
+
 
 
 
@@ -53,7 +54,8 @@ parseContentListingHTML = (html)->
     # divider class is 'r_top_r'
     el              = document.createElement('tbody')
     el.innerHTML    = html
-    i               = 0
+    i               = 0 # entry counter
+    j               = 0 # tr counter
     listing         = []
     data            = new RentalProperty
     data.setRegion  currentRegion 
@@ -62,7 +64,7 @@ parseContentListingHTML = (html)->
         
         if ( row.className isnt 'r_top_r' and row.className isnt 'border_bo' )
             tds = row.children
-            for td in tds
+            for td, k in tds
                 if ( td.className isnt 'td.right_border_table' ) # this td has no useful info
                     
                     if ( td.querySelectorAll( 'span.photocount' ).length ) # get photos
@@ -71,14 +73,47 @@ parseContentListingHTML = (html)->
 
                     else # default case - extract text content
                         data.addRemark td.textContent.replace('&nbsp;', '')
+
+                # if ( j is 0 and k is 0 ) this is where the images live, combine with @todo above
+
+                if ( j is 0 and k is 1 ) # this row could hold the address line
+                    data.setAddress td.textContent.replace('&nbsp;', '')
+
+                if ( j is 1 and k is 0 ) # num of rooms and wall metrial
+                    data.setNumRooms td.textContent.replace('&nbsp;', '') # @todo clean up text formatting
+
+                if ( j is 1 and k is 1 ) # this gives data in the form "floor/total floors" 
+                    data.setFloor td.textContent.replace('&nbsp;', '') 
+
+                if ( j is 1 and k is 2 ) # property area (in square m)
+                    data.setArea td.textContent.replace('&nbsp;', '')
+
+                if ( j is 1 and k is 3 ) # prices
+                    containers = td.querySelectorAll "nobr"
+                    data.setPriceUAH containers[0].textContent.replace(' ', '')
+                    data.setPriceUSD containers[1].textContent.replace(' ', '').replace('$', '')
+                    # @note there's also a price per square meter in USD available from containers[2] node
+
+                if ( j is 2 and k is 0 ) # contact info 
+                    containers = td.querySelectorAll "nobr, a"
+                    for c in containers # @note: more complicated logic can extract agency info
+                        data.addContact( c.textContent )
+
+                if ( j is 3 and k is 0 ) # additional remarks
+                    data.addRemark td.textContent.replace('&nbsp;', '') # need to sanitize string
+
+            j++
         
         else if ( row.className is 'r_top_r' ) # start next data record
             listing.push data.getData()
             data = new RentalProperty
             data.setRegion currentRegion 
             i++
+            j = 0
 
-    console.log listing
+    listing
+
+
 
 # function called recursively during crawl
 # 
@@ -118,8 +153,14 @@ spider = (url)->
 
             @click 'span#detail_all' # click button to unfold all detailed info
             htmlContent = @getHTML 'table.ogolosh-avto-sp tbody'
-            rawData     = parseContentListingHTML( htmlContent )
-            # console.log rawData
+            listing     = parseContentListingHTML( htmlContent )
+
+            console.log "listing count: " + listing.length
+
+            # print out scraped data
+            # for record in listing
+            #     @echo JSON.stringify( record, null, '\t' )
+            #     @echo "--------------------------------------"
 
         # recurse in
         if ( pendingUrls.length > 0 )
