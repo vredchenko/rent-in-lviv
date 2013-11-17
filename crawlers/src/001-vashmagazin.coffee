@@ -4,6 +4,7 @@ casper              = require('casper').create(
     verbose:    true
     #logLevel:   "debug"
 )
+#util                = require 'util'
 RentalProperty      = require './rental-property'
 currentRegion       = null
 startUrl            = 'http://vashmagazin.ua/cat/catalog/?rub=128'
@@ -17,7 +18,7 @@ pendingUrls         = []
 # @todo  save to FS
 # @todo  investigate Spooky.js for running Casper from inside nodejs
 # @todo  write a test suite ensuring markup we rely on has not changed
-
+# @todo  better jshinting with https://github.com/sindresorhus/jshint-stylish
 
 
 
@@ -105,6 +106,7 @@ parseContentListingHTML = (html)->
             j++
         
         else if ( row.className is 'r_top_r' ) # start next data record
+            console.log JSON.stringify( data.getData(), null, 2 )
             listing.push data.getData()
             data = new RentalProperty
             data.setRegion currentRegion 
@@ -154,13 +156,8 @@ spider = (url)->
             @click 'span#detail_all' # click button to unfold all detailed info
             htmlContent = @getHTML 'table.ogolosh-avto-sp tbody'
             listing     = parseContentListingHTML( htmlContent )
-
-            console.log "listing count: " + listing.length
-
-            # print out scraped data
-            # for record in listing
-            #     @echo JSON.stringify( record, null, '\t' )
-            #     @echo "--------------------------------------"
+            
+            console.log "number of data items on pageLinks: " + listing.length
 
         # recurse in
         if ( pendingUrls.length > 0 )

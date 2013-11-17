@@ -2,31 +2,23 @@
 
 class RentalProperty
 
-    data: 
-        address:            null
-        region:             null
-        
-        nRooms:             null
-        floor:              null
-        area:               null
-
-        price:
-            uah:            null
-            usd:            null
-            euro:           null
-        
-        comments:           null
-        
-        images:             []
-        nImages:            null
-        
-        contacts:           []
-        
-        additionalRemarks:  []
-
-
     constructor: ->
-
+        @data = 
+            address:            null
+            region:             null
+            nRooms:             null
+            floor:              null
+            area:               null
+            price:
+                uah:            null
+                usd:            null
+                euro:           null
+            comments:           null
+            images:             []
+            nImages:            null
+            contacts:           []
+            additionalRemarks:  []
+        
     generateHash: ->
         # generate an md5 hash based on all data to create a UID
 
