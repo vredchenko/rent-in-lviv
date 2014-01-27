@@ -1,6 +1,7 @@
 _                   = require 'underscore' 
 moment              = require 'moment'
 easyXML             = require '../node_modules/easyxml/index.js'
+fs                  = require 'fs'
 casper              = require('casper').create(
     verbose:    true
     #logLevel:   "debug"
@@ -11,6 +12,8 @@ currentRegion       = null
 startUrl            = 'http://vashmagazin.ua/cat/catalog/?rub=128'
 visitedUrls         = []
 pendingUrls         = []
+dumpToPath          = "./data/"+(new Date().getTime())+".txt"
+dumpBuffer          = ""
 
 
 
@@ -108,10 +111,9 @@ parseContentListingHTML = (html)->
         
         else if ( row.className is 'r_top_r' ) # start next data record
             # console.log JSON.stringify( data.getData(), null, 2 )
-            console.log "here"
-            @temp = easyXML.render( data.getData() )
-            console.log "there"
-
+            # console.log easyXML.render( data.getData() )
+            dumpBuffer += easyXML.render( data.getData() )
+            
             listing.push data.getData()
             data = new RentalProperty
             data.setRegion currentRegion 
@@ -176,4 +178,7 @@ casper.start startUrl, ->
 
 # Start the run
 casper.run ->
+    # dump results to file
+    fs.write(dumpToPath, dumpBuffer, 'w')
+
     @echo("Done.").exit()
