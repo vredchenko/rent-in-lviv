@@ -1,10 +1,11 @@
 _                   = require 'underscore' 
 moment              = require 'moment'
+easyXML             = require '../node_modules/easyxml/index.js'
 casper              = require('casper').create(
     verbose:    true
     #logLevel:   "debug"
 )
-#util                = require 'util'
+# util                = require 'util'
 RentalProperty      = require './rental-property'
 currentRegion       = null
 startUrl            = 'http://vashmagazin.ua/cat/catalog/?rub=128'
@@ -106,7 +107,11 @@ parseContentListingHTML = (html)->
             j++
         
         else if ( row.className is 'r_top_r' ) # start next data record
-            console.log JSON.stringify( data.getData(), null, 2 )
+            # console.log JSON.stringify( data.getData(), null, 2 )
+            console.log "here"
+            @temp = easyXML.render( data.getData() )
+            console.log "there"
+
             listing.push data.getData()
             data = new RentalProperty
             data.setRegion currentRegion 
