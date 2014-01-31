@@ -1,12 +1,12 @@
-_                   = require 'underscore' 
-moment              = require 'moment'
+_                   = require '../node_modules/underscore/underscore.js' 
+moment              = require '../node_modules/moment/moment.js'
 easyXML             = require '../node_modules/easyxml/index.js'
 fs                  = require 'fs'
 casper              = require('casper').create(
     verbose:    true
     #logLevel:   "debug"
 )
-# util                = require 'util'
+#util                = require 'util'
 RentalProperty      = require './rental-property'
 currentRegion       = null
 startUrl            = 'http://vashmagazin.ua/cat/catalog/?rub=128'
