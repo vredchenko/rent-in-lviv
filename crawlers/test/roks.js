@@ -20,29 +20,30 @@ request('http://www.radioroks.com.ua/playlist/27-07-2011.html', function (error,
       var title3 = $(title4).eq(0).text();
       var url = a.attr("href") || "";
     
-            var metadata = {
-       
-       "title": title,
-       "title2": title2,
-     "url":url,
-        "title3": title3
+      console.log(a);
 
+      var metadata = {
+        "title": title,
+        "title2": title2,
+        "url":url,
+        "title3": title3
       };
-     //  console.log(js2xmlparser("root1", metadata));
+      // console.log(js2xmlparser("root1", metadata));
       // Push meta-data into parsedResults array
       parsedResults.push(metadata);
     });
+    
     // Log our finished parse results in the terminal
- dumpBuffer +=parsedResults;
+    dumpBuffer +=parsedResults;
     // dumpBuffer +=easyXML.render(parsedResults);
     dumpBuffer +=js2xmlparser("root1", parsedResults,include=0 ) ;
-    dumpBuffer=dumpBuffer.substring(dumpBuffer.search("<root1>"),999999999)
-    dumpBuffer="<root>"+dumpBuffer+"</root>"
-   // dumpBuffer=dumpBuffer.replace('<?xml version="1.0" encoding="UTF-8" ?>',"")
-   console.log(dumpBuffer);
-   // console.log(easyXML.render(parsedResults));
+    dumpBuffer=dumpBuffer.substring(dumpBuffer.search("<root1>"),999999999) ;
+    dumpBuffer="<root>"+dumpBuffer+"</root>" ;
+    // dumpBuffer=dumpBuffer.replace('<?xml version="1.0" encoding="UTF-8" ?>',"")
+    //console.log(dumpBuffer);
+    // console.log(easyXML.render(parsedResults));
     //console.log(parsedResults);
-fs.writeFile(dumpToPath, dumpBuffer);
+    fs.writeFile(dumpToPath, dumpBuffer);
 
     //return this.echo("Done.").exit();
   }
