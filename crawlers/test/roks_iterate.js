@@ -14,7 +14,7 @@ console.log(temp);
     var dateStr = padStr(temp.getFullYear()) +"-"+
                   padStr(1 + temp.getMonth()) +"-"+
                   padStr(temp.getDate()) ;
-var dumpToPath = "./data/rr.xml";
+var dumpToPath = "./data/" + dateStr+ "rr.xml";
 var   dumpBuffer = "";
 var datepar=padStr(temp.getDate()) +"-"+padStr(1 + temp.getMonth()) +"-"+padStr(temp.getFullYear());
 request('http://www.radioroks.com.ua/playlist/'+datepar+'.html', function (error, response, html) {
@@ -49,12 +49,12 @@ request('http://www.radioroks.com.ua/playlist/'+datepar+'.html', function (error
     // dumpBuffer +=easyXML.render(parsedResults);
     dumpBuffer +=js2xmlparser("root1", parsedResults,include=0 ) ;
     dumpBuffer=dumpBuffer.substring(dumpBuffer.search("<root1>"),999999999)
-    //dumpBuffer="<root>"+dumpBuffer+"</root>"
+    dumpBuffer="<root>"+dumpBuffer+"</root>"
    // dumpBuffer=dumpBuffer.replace('<?xml version="1.0" encoding="UTF-8" ?>',"")
    //console.log(dumpBuffer);
    // console.log(easyXML.render(parsedResults));
     //console.log(parsedResults);
-fs.appendFile(dumpToPath, dumpBuffer, function (err) {});
+fs.writeFile(dumpToPath, dumpBuffer);
 
     //return this.echo("Done.").exit();
 
@@ -92,34 +92,8 @@ Rock-Style:
   }
 });
 }
-var  fs = require('fs');
-var dumpToPath = "./data/rr.xml";
-var   dumpBuffer = "<root>";
-fs.truncate(dumpToPath, "", function(){console.log('done')})
-
-
-setTimeout(function() {
-    fs.appendFile(dumpToPath, dumpBuffer, function (err) {});
-}, 30000);
-
 var now = new Date(Date.now());
-
-
-for (var d = new Date(2014, 0, 1); d <= now; d.setDate(d.getDate() + 1)) {
+for (var d = new Date(2013, 0, 1); d <= now; d.setDate(d.getDate() + 1)) {
 //for (var d = 0; d <= 10; d ++) {
-
-    roks(d)
-
-
-
+roks(d);
 }
-var dumpToPath = "./data/rr.xml";
-var   dumpBuffer = "</root>";
-setTimeout(function() {
-    fs.appendFile(dumpToPath, dumpBuffer, function (err) {});
-}, 30000);
-
-
-
-         
-
